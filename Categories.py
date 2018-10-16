@@ -33,6 +33,58 @@ category_schema = CategorySchema()
 category_schema_schema = CategorySchema(many=True)
 
 
+# endpoint to create new category
+@app.route("/category", methods=["POST"])
+def add_category():
+    id = request.json['id']
+    name = request.json['name']
+    parentCategory = request.json['parentCategory']
+    isVisible = request.json['isVisible']
+
+    new_category = Categories(id, name, parentCategory, isVisible)
+
+    db.session.add(new_category)
+    db.session.commit()
+
+    return jsonify(new_category)
+
+
+# endpoint to show all users
+@app.route("/categories", methods=["GET"])
+def get_user():
+    all_categories = Categories.query.all()
+    result = category_schema.dump(all_categories)
+    return jsonify(result.data)
+
+
+# endpoint to get category detail by id
+@app.route("/category/<id>", methods=["GET"])
+def category_detail(id):
+    category = Categories.query.get(id)
+    return category_schema.jsonify(category)
+
+
+# endpoint to update user
+@app.route("/user/<id>", methods=["PUT"])
+def user_update(id):
+    category = Categories.query.get(id)
+    isVisible = request.json['isVisible']
+
+    category.isVisible = isVisible
+
+
+    db.session.commit()
+    return user_schema.jsonify(category)
+
+
+# endpoint update visibility
+@app.route("/user/<id>", methods=["PATCH"])
+def update_visibility(id):
+    catetory = Categories.query.get(id)
+    db.session.delete(catetory)
+    db.session.commit()
+
+    return category_schema.jsonify(user)
 
 
 if __name__ == '__main__':
